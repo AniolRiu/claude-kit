@@ -1,0 +1,102 @@
+# claude-kit
+
+Personal Claude Code kit: agents, skills and cross-project methods, published as
+a plugin and served by its own marketplace from this same repository.
+
+This file is the contract for working *on* this repo. It is not shipped as part
+of what the plugin exports.
+
+## Why this repo exists
+
+Configuration under `~/.claude/` lives on one machine and does not exist in a
+cloud session. Anything that does not travel with a repository disappears.
+
+This repo is the single source of truth for everything that must behave the same
+across every project and every machine. A project adopts it with one committed
+file (`.claude/settings.json`, see `project-template/`) and gets everything here.
+
+## Design principles
+
+1. **Content goes in skills; agents stay thin.** Skills follow an open spec that
+   other agents also understand; the plugin format is Claude Code's. The value
+   must be portable and the wrapper disposable. A subagent says who it is and
+   which skill to delegate to — not much more.
+
+   Practical consequence: an agent whose `tools:` frontmatter omits `Skill`
+   cannot reach the skill holding its content. Include it, or drop `tools:`
+   entirely and inherit.
+
+2. **A subagent only when separate context is needed.** If the work is noisy —
+   browser navigation, DOM, screenshots, test output — and would eat the main
+   conversation's context, it is a subagent. Otherwise it is a skill.
+
+3. **Nothing project-specific.** This is how things are done in general. What
+   belongs to one project belongs in that project's `CLAUDE.md`. An instruction
+   naming a client, a concrete URL or a concrete table is in the wrong place.
+
+4. **No secrets, ever.** This repo is public. Invented test users are fine;
+   nothing else is.
+
+5. **Identical locally and in the cloud.** Nothing that depends on an absolute
+   path from one machine, a tool installed only at home, or network access to
+   domains a container will not have open.
+
+6. **Short.** Everything here consumes context. Five sharp lines beat forty
+   exhaustive ones. A skill past ~200 lines gets consolidated or split.
+
+## Before adding anything
+
+The first question is always: **is this genuinely cross-project, or does it
+belong to one project?** Ask it out loud before writing a line. If the answer is
+"one project", it goes in that project's `CLAUDE.md`, not here.
+
+## Choosing the mechanism
+
+Skills load when they are judged relevant, so they suit conditional guidance
+("when you do X, do it this way"). They are the wrong tool for rules that must
+apply *always*.
+
+| When the guidance applies | Mechanism |
+|---|---|
+| A kind of work ("when writing tests") | Skill |
+| Work that is noisy and needs its own context | Thin subagent delegating to a skill |
+| A specific, detectable moment (about to commit, just edited a file) | Hook with a matcher — `PreToolUse` can also deny with a reason, `PostToolUse` runs after |
+| Genuinely every session | `SessionStart` hook — its stdout is injected as context, paid once per session |
+| Only when explicitly invoked | Slash command under `commands/` |
+
+`UserPromptSubmit` injects on every single turn. It is the most guaranteed and
+the most expensive; it works against principle 6. Avoid it.
+
+Never write a skill with an inflated description hoping it triggers every time.
+If a rule needs to always apply, say so and pick a hook instead.
+
+## Skill descriptions
+
+Skills compete to activate through their `description`. Each one must state
+*when* it applies, not only what it does — otherwise adding skills makes the
+existing ones worse. `skills/firebase-emulator/SKILL.md` is the reference.
+
+## Layout
+
+```
+.claude-plugin/
+  plugin.json         the plugin manifest
+  marketplace.json    marketplace "aniol", serving this repo as one plugin
+agents/               thin subagents
+skills/               the content: one directory per skill, each with SKILL.md
+project-template/
+  settings.json       drop into a project's .claude/ to enable the plugin
+```
+
+`hooks/hooks.json`, `commands/` and `scripts/` do not exist yet; add them when a
+rule actually calls for one. Inside a plugin, reference bundled files through
+`${CLAUDE_PLUGIN_ROOT}` — never an absolute path (principle 5).
+
+## Checks
+
+```bash
+claude plugin validate .
+```
+
+Also check by hand: no secrets, no project names, no absolute paths, and every
+skill still under ~200 lines.
