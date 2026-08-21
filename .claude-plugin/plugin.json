@@ -1,7 +1,7 @@
 {
   "name": "claude-kit",
   "version": "0.1.0",
-  "description": "Personal Claude Code kit: a local-first web testing agent, a UI/UX expert agent, and a Firebase emulator skill for building a real local test environment.",
+  "description": "Personal Claude Code kit: agents, skills and cross-project methods, built around testing against a real local environment instead of something deployed.",
   "author": {
     "name": "Aniol"
   }

@@ -1,10 +1,15 @@
 # claude-kit
 
-A small personal kit for [Claude Code](https://claude.com/claude-code): two agents
-and one skill, built around a single idea — **test against a real local
-environment, never against something deployed.**
+A personal kit for [Claude Code](https://claude.com/claude-code): the agents,
+skills and cross-project methods I reuse everywhere, so that they exist in a
+cloud session as well as on my own machine. What is here today is built around a
+single idea — **test against a real local environment, never against something
+deployed.**
 
-This repository is both the plugin and the marketplace that serves it.
+This repository is both the plugin and the marketplace that serves it. The rules
+for what belongs here are in [`CLAUDE.md`](CLAUDE.md); the short version is that
+the content lives in skills, the agents stay thin, and nothing project-specific
+gets in.
 
 ## Install
 
@@ -32,10 +37,14 @@ project's `.claude/settings.json`:
 
 ## What's inside
 
-### `webtester` (agent)
+### `web-testing` (skill) and `webtester` (agent)
 
 Drives a real browser with Playwright against the **local** instance of the app,
 to find out whether a feature actually works end to end.
+
+The method is the skill; the agent is a thin wrapper around it, and exists only
+because a browser session is noisy enough to be worth keeping out of the main
+conversation's context. The skill works on its own too, without the agent.
 
 - Reads the **"Test environment"** section of the project's `CLAUDE.md` for the
   base URL, start command, test users and reset procedure. If that section is
@@ -81,13 +90,15 @@ the actual deployment.
 ## Layout
 
 ```
+CLAUDE.md             why this repo exists and what may go in it
 .claude-plugin/
   plugin.json         claude-kit, v0.1.0
   marketplace.json    marketplace "aniol", one plugin at "./"
 agents/
-  webtester.md
+  webtester.md        identity, and delegation to skills/web-testing
   uix-expert.md
 skills/
+  web-testing/SKILL.md
   firebase-emulator/SKILL.md
 project-template/
   settings.json       drop into a project's .claude/ to enable the plugin
