@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "aniol": {
+      "source": {
+        "source": "github",
+        "repo": "AniolRiu/claude-kit"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "claude-kit@aniol": true
+  }
+}
