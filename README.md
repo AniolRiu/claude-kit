@@ -62,10 +62,25 @@ conversation's context. The skill works on its own too, without the agent.
   no cookies, tokens or screenshots of authenticated pages ever go in that file —
   it gets committed.
 
-### `uix-expert` (agent)
+### `ui-ux` (skill) and `uix-expert` (agent)
 
-UI/UX review and design. Currently a **placeholder** with correct frontmatter and a
-short generic body, waiting for its real prompt.
+Reviews an interface as the person using it: hierarchy, states, copy, spacing and
+accessibility. Same split as above — the method is the skill, the agent is thin.
+
+It exists as a separate agent because reading enough UI to have an opinion fills a
+context window, and because the design mode of looking loses every argument it has
+to share with the implementation mode, where "it already works" always wins.
+
+- Looks at what the screen asks of the person before reading the files that build
+  it, and treats the **states** — loading, empty, error, no-permission — as the
+  place products usually fall apart, because seeded data hides them.
+- Returns **three to five findings, ranked**, never a list of thirty nits. Each one
+  says what is there, what problem it causes the person using it, and the concrete
+  alternative — never the principle on its own.
+- States its assumptions about who the user is, and separates what changes
+  behaviour from what changes appearance.
+- Is **read-only**: it does not edit the code and cannot run the app. When a state
+  can only be judged by seeing it, it asks for a screenshot or for `webtester`.
 
 ### `firebase-emulator` (skill)
 
@@ -96,9 +111,10 @@ CLAUDE.md             why this repo exists and what may go in it
   marketplace.json    marketplace "aniol", one plugin at "./"
 agents/
   webtester.md        identity, and delegation to skills/web-testing
-  uix-expert.md
+  uix-expert.md       identity, and delegation to skills/ui-ux
 skills/
   web-testing/SKILL.md
+  ui-ux/SKILL.md
   firebase-emulator/SKILL.md
 project-template/
   settings.json       drop into a project's .claude/ to enable the plugin
