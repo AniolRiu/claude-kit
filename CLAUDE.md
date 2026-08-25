@@ -18,10 +18,13 @@ Adopting it takes two steps, not one. The committed `.claude/settings.json` (see
 `project-template/`) *registers* the marketplace and marks the plugin as enabled —
 but since Claude Code 2.1.195 a plugin from an external source is **not installed
 by that file alone**, so it silently does not load until someone runs
-`claude plugin install claude-kit@aniol` on that machine. The install lives in
-`~/.claude/`, which an ephemeral cloud container does not keep, so a cloud
-environment has to run that command from its setup script on every session or the
-kit will not be there. Check with `claude plugin list` before concluding that a
+`claude plugin install claude-kit@aniol` — once per machine locally, and once per
+cloud environment from its **Setup script**, which runs before Claude Code launches
+and is then snapshotted. A `SessionStart` hook cannot stand in for it: hooks run
+after Claude Code has loaded its plugins.
+
+So principle 5 holds per environment, not per repository: the committed file
+travels, the install does not. Check `claude plugin list` before concluding that a
 skill is broken.
 
 ## Design principles

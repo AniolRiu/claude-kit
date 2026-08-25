@@ -12,5 +12,9 @@ machine also needs, once:
 claude plugin install claude-kit@aniol
 ```
 
-In a cloud session that install does not survive the container, so run it from the
-environment's setup script instead. Verify with `claude plugin list`.
+For cloud sessions, put those two lines in the **Setup script** field of the cloud
+environment instead — it runs before Claude Code launches and its filesystem is
+snapshotted, so it is paid once per environment. A `SessionStart` hook is too late:
+it runs after Claude Code has already loaded its plugins.
+
+Verify with `claude plugin list`.

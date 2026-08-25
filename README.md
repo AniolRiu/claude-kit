@@ -42,13 +42,22 @@ is not installed by settings alone — it does not load until someone runs
 conversation: the skills are simply absent, and Claude answers as if the kit did
 not exist.
 
-In an **ephemeral cloud session** the install lives in `~/.claude/` and does not
-survive the container, so the environment's setup script has to run it every time:
+For **cloud sessions** the install lives in the container's `~/.claude/`, which no
+committed file can create. It goes in the **Setup script** field of the cloud
+environment (the environment dialog at claude.ai/code):
 
 ```bash
-claude plugin marketplace add AniolRiu/claude-kit
-claude plugin install claude-kit@aniol
+claude plugin marketplace add AniolRiu/claude-kit || true
+claude plugin install claude-kit@aniol || true
 ```
+
+That script runs as root before Claude Code launches, and Anthropic snapshots the
+filesystem afterwards — so this is paid **once per environment**, not once per
+session, and every later session starts with the kit already installed. The
+`|| true` matters: a setup script that exits non-zero stops the session starting.
+
+A `SessionStart` hook does **not** work for this, however tempting: it runs *after*
+Claude Code launches, so a plugin installed there is not loaded in that session.
 
 When something from the kit does not seem to work, check that first:
 
