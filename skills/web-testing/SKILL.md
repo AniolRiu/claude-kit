@@ -21,7 +21,13 @@ Concretely, before writing a single line of test code:
 2. Take the base URL, the start command, the test users, and the reset procedure
    from that section.
 3. If the app is not running yet, start it with the command that section gives you,
-   and wait until it actually answers before continuing.
+   and wait until it actually answers before continuing. In a cold cloud session
+   that is **minutes, not seconds**: dependencies may need installing, and local
+   backends often download a runtime on first start. Start it in the **background**
+   and poll the base URL, rather than blocking on a foreground command that will
+   hit a timeout. A start that looks stalled usually is not — read the log it is
+   writing instead of killing it and retrying. If the section documents more than
+   one command, start them in the order given and wait for each.
 
 **If `CLAUDE.md` has no "Test environment" section, stop.** Do not guess
 `http://localhost:3000`. Do not scan `package.json` for a dev script and hope.
@@ -34,25 +40,68 @@ Firestore.
 A wrong URL is worse than no test: it either fails for reasons that have nothing
 to do with the code, or — far worse — it writes to something real.
 
-## 2. How to work
+## 2. First, a browser that actually launches
 
-Write the Playwright script to `/tmp` and run it with Bash. Do not add test files
-to the repository; the repo's own test suite is not your concern and must not be
-grown silently.
+Playwright is usually **not** a dependency of the project under test, and in a
+container or cloud session the browsers are pre-installed but need not match the
+version npm hands you. Settle both once, before writing any flow.
+
+**Can a script outside the repo import `playwright`?** Resolution is relative to
+the script, not to the repo, so the project's `node_modules` does not help.
 
 ```
-cat > /tmp/wt-checkout.mjs <<'SCRIPT'
+mkdir -p /tmp/wt && cd /tmp/wt && node -e "require.resolve('playwright')" || echo MISSING
+```
+
+If it is missing, do not add it to the project's `package.json` — you never grow
+the repo. Install it in that scratch directory and run the scripts from there, and
+skip the browser download: the binaries are already on disk, and fetching them is
+slow at best and blocked at worst.
+
+```
+npm init -y >/dev/null && PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm i playwright
+```
+
+**Never run `playwright install` or `npx playwright install`.** Managed
+environments block it. Locate what is already there instead, and derive the path —
+never hardcode a build number:
+
+```
+PW=${PLAYWRIGHT_BROWSERS_PATH:-$HOME/.cache/ms-playwright}; ls "$PW"
+CHROME=$(ls -d "$PW"/chromium 2>/dev/null || ls -d "$PW"/chromium-*/chrome-linux/chrome 2>/dev/null | head -1)
+```
+
+**Then pass `executablePath` explicitly**, always. Do not rely on Playwright
+finding the browser itself: it looks for the build number *its* version expects,
+which is often not the one on disk, and the error it prints tells you to run the
+one command you must not run.
+
+If a browser still will not launch, **stop and report an incomplete environment**,
+exactly as for a missing "Test environment" section. Do not fall back to `curl`,
+do not assert against HTML fetched without a browser, and never report a flow as
+passing that you did not actually drive.
+
+## 3. How to work
+
+Write the Playwright script next to that scratch `node_modules` and run it with
+Bash. Do not add test files to the repository; the repo's own test suite is not
+your concern and must not be grown silently.
+
+```
+cat > /tmp/wt/checkout.mjs <<'SCRIPT'
 import { chromium, expect } from 'playwright/test';
+
+const browser = await chromium.launch({ executablePath: process.env.WT_CHROME });
 // ... one flow, start to finish
 SCRIPT
 
-node /tmp/wt-checkout.mjs
+WT_CHROME="$CHROME" node /tmp/wt/checkout.mjs
 ```
 
 Run headless by default. Keep each script focused on one flow, so that when it
 fails you know what failed.
 
-## 3. Selectors
+## 4. Selectors
 
 Use selectors that describe what the user sees, not how the page is built:
 
@@ -67,7 +116,7 @@ be reached by role or label, that is an accessibility finding — report it, and
 a `data-testid` as the fallback, noting in the report that the element needs a
 proper accessible name.
 
-## 4. Waiting
+## 5. Waiting
 
 Wait for **state**, never for time. `page.waitForTimeout(2000)` is banned — it is
 how a suite becomes slow and flaky at the same time.
@@ -82,7 +131,7 @@ Wait for the thing you actually care about:
 If something is genuinely asynchronous and unobservable in the DOM, that is a gap
 in the UI — the user cannot tell either. Say so.
 
-## 5. When a test fails
+## 6. When a test fails
 
 A failure is information, and it must be classified correctly before anyone
 touches code. Every failure is exactly one of three things:
@@ -96,24 +145,23 @@ introduced by the script, a test user that lacks the role the flow requires. Fix
 the script and run again. Own it plainly in the report — a false alarm costs
 someone an afternoon.
 
-**An incomplete environment.** The emulator is not running, the seed data does not
-contain the record the flow needs, a required environment variable is unset, a
-service the page calls is not up. This is not an app bug and must never be reported
-as one. Say exactly what is missing and how to provide it.
+**An incomplete environment.** No browser, the emulator not running, seed data
+without the record the flow needs, an unset environment variable, a service the
+page calls that is down. This is not an app bug and must never be reported as one.
+Say exactly what is missing and how to provide it.
 
-If you cannot tell which of the three it is, say that too, and say what evidence
-would settle it. "I don't know yet" is a legitimate report; a confident wrong
-diagnosis is not.
+If you cannot tell which of the three it is, say so and say what evidence would
+settle it. "I don't know yet" is a legitimate report; a confident wrong diagnosis
+is not.
 
 **Never weaken an assertion to make a test pass.** Not by loosening the expected
 text, not by broadening a selector until it matches something, not by dropping a
 count check, not by wrapping it in a try/catch, not by retrying around a real
 failure. A green test that asserts nothing is worse than a red one, because it
 will be trusted. If an assertion is genuinely wrong about the intended behaviour,
-change it deliberately and state in the report that what was being asserted
-changed, and why.
+change it deliberately and say in the report what changed, and why.
 
-## 6. Durable knowledge: `.claude/webtester/FLOWS.md`
+## 7. Durable knowledge: `.claude/webtester/FLOWS.md`
 
 Maintain one file: `.claude/webtester/FLOWS.md`, at the root of the project being
 tested. It holds what is still true next week:
@@ -125,14 +173,11 @@ tested. It holds what is still true next week:
   modal that must be dismissed before the page is interactive)
 - flows that are known broken, with a date
 
-Rules for this file:
-
-- **Keep it under 200 lines.** When it gets close, consolidate: merge overlapping
-  flow descriptions, delete notes about code that no longer exists, collapse three
-  specific observations into the one general rule they were all pointing at. Do not
-  let it become an append-only log.
-- Write it for the next agent, who has never seen this app.
-- Update it when something durable was learned; leave it alone otherwise.
+Write it for the next agent, who has never seen this app. Update it when something
+durable was learned and leave it alone otherwise. **Keep it under 200 lines**: when
+it gets close, consolidate — merge overlapping flows, delete notes about code that
+no longer exists, collapse three observations into the rule they were pointing at.
+Never let it become an append-only log.
 
 **Execution logs live in `/tmp` and are meant to be lost.** Script output, traces,
 screenshots, HTML dumps, timings — none of it goes in `FLOWS.md` or anywhere else
@@ -142,23 +187,21 @@ in the repository. It is evidence for this run's report, not knowledge.
 
 `FLOWS.md` gets committed. Treat it as public.
 
-- **No cookies. No session tokens. No auth headers. No API keys.** Not even
-  truncated, not even expired, not even as an example.
+- **No cookies, session tokens, auth headers or API keys.** Not truncated, not
+  expired, not as an example. If one is needed to debug, keep it in `/tmp` for that
+  run and let it disappear.
 - **No screenshots of authenticated pages** — they carry real names, emails,
-  balances, and record IDs.
-- **No real user data** copied out of the app.
+  balances and record IDs — and no real user data copied out of the app.
 - Test credentials from the documented "Test environment" section are fine: they
   are already public in `CLAUDE.md` and only exist against the local emulator.
 
-If a token is needed to debug, keep it in `/tmp` for that run and let it disappear.
-
-## 7. The report
+## 8. The report
 
 Return plain text, not a file:
 
 - **What was tested** — the flow, the base URL, the user and role.
 - **Result** — pass or fail, per assertion that matters.
-- **On failure** — the classification from §5, the evidence, the minimal repro.
+- **On failure** — the classification from §6, the evidence, the minimal repro.
 - **UX observations** — anything that worked but felt wrong: an unlabelled control,
   a silent failure, a state with no feedback, a dead end. Keep this separate from
   the functional results.
