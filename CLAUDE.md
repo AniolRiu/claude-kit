@@ -41,8 +41,15 @@ file (`.claude/settings.json`, see `project-template/`) and gets everything here
    path from one machine, a tool installed only at home, or network access to
    domains a container will not have open.
 
-6. **Short.** Everything here consumes context. Five sharp lines beat forty
-   exhaustive ones. A skill past ~200 lines gets consolidated or split.
+6. **Short, and about one job.** Everything here consumes context. Five sharp
+   lines beat forty exhaustive ones — cut words, not substance.
+
+   Length is a smell, not the criterion. Past ~200 lines, look for what is
+   padding and remove it; do not compress prose that earns its place just to
+   land under a number. A skill gets **split** for a different reason: it covers
+   two jobs *and* something would plausibly load the second one without the
+   first. Until that second consumer exists, splitting only buys indirection and
+   one more description competing to activate.
 
 ## Before adding anything
 
@@ -98,5 +105,5 @@ rule actually calls for one. Inside a plugin, reference bundled files through
 claude plugin validate .
 ```
 
-Also check by hand: no secrets, no project names, no absolute paths, and every
-skill still under ~200 lines.
+Also check by hand: no secrets, no project names, no absolute paths, and no skill
+that has quietly grown into two.
