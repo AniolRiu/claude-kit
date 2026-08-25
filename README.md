@@ -18,7 +18,7 @@ claude plugin marketplace add AniolRiu/claude-kit
 claude plugin install claude-kit@aniol
 ```
 
-Or, to enable it automatically in a project, copy
+To make a project ask for it, copy
 [`project-template/settings.json`](project-template/settings.json) into that
 project's `.claude/settings.json`:
 
@@ -33,6 +33,28 @@ project's `.claude/settings.json`:
     "claude-kit@aniol": true
   }
 }
+```
+
+**That file is not enough on its own.** Since Claude Code 2.1.195 it registers the
+marketplace and marks the plugin as enabled, but a plugin from an external source
+is not installed by settings alone — it does not load until someone runs
+`claude plugin install claude-kit@aniol` on that machine. Nothing warns you in
+conversation: the skills are simply absent, and Claude answers as if the kit did
+not exist.
+
+In an **ephemeral cloud session** the install lives in `~/.claude/` and does not
+survive the container, so the environment's setup script has to run it every time:
+
+```bash
+claude plugin marketplace add AniolRiu/claude-kit
+claude plugin install claude-kit@aniol
+```
+
+When something from the kit does not seem to work, check that first:
+
+```bash
+claude plugin list      # is claude-kit@aniol installed and enabled?
+claude plugin details claude-kit   # which skills and agents it contributes
 ```
 
 ## What's inside
@@ -125,6 +147,7 @@ skills/
   plugin-smoke-test/SKILL.md   temporary canary, delete after checking
 project-template/
   settings.json       drop into a project's .claude/ to enable the plugin
+  README.md           and the install step that settings alone does not do
 ```
 
 ## Development

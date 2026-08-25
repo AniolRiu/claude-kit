@@ -12,8 +12,17 @@ Configuration under `~/.claude/` lives on one machine and does not exist in a
 cloud session. Anything that does not travel with a repository disappears.
 
 This repo is the single source of truth for everything that must behave the same
-across every project and every machine. A project adopts it with one committed
-file (`.claude/settings.json`, see `project-template/`) and gets everything here.
+across every project and every machine.
+
+Adopting it takes two steps, not one. The committed `.claude/settings.json` (see
+`project-template/`) *registers* the marketplace and marks the plugin as enabled —
+but since Claude Code 2.1.195 a plugin from an external source is **not installed
+by that file alone**, so it silently does not load until someone runs
+`claude plugin install claude-kit@aniol` on that machine. The install lives in
+`~/.claude/`, which an ephemeral cloud container does not keep, so a cloud
+environment has to run that command from its setup script on every session or the
+kit will not be there. Check with `claude plugin list` before concluding that a
+skill is broken.
 
 ## Design principles
 
