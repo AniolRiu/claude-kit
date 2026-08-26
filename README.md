@@ -60,14 +60,27 @@ A `SessionStart` hook does **not** work for this, however tempting: it runs *aft
 Claude Code launches, so a plugin installed there is not loaded in that session.
 
 **The repository has to stay public for that to work.** Installing from the setup
-script was tested against a private repository and failed: inside a running cloud
-session the proxy injects git credentials, so a private marketplace clones fine,
-but the setup script runs before Claude Code launches and evidently does not get
-the same treatment. Nothing reports the failure — `|| true` keeps the session
-starting, and the snapshot is then taken **without** the plugin, so every later
-session skips the setup script and starts broken too. Recovering means changing the
-script's text, which is what forces the snapshot to rebuild; making the repository
-public again is not enough on its own.
+script was tested against a private repository and failed on the clone:
+
+```
+fatal: could not read Username for 'https://github.com': terminal prompts disabled
+```
+
+Inside a running cloud session the proxy injects git credentials, so a private
+marketplace clones fine there. At setup-script time those credentials do not exist
+yet — git got far enough to ask for a username. It is authentication, not protocol:
+the clone was already going over HTTPS, so `CLAUDE_CODE_PLUGIN_PREFER_HTTPS` makes
+no difference.
+
+The failure is silent: `|| true` keeps the session starting, the snapshot is then
+taken **without** the plugin, and every later session skips the setup script and
+starts broken too. Recovering means changing the script's text, which is what forces
+the snapshot to rebuild — making the repository public again does nothing on its
+own.
+
+Keeping it private would mean putting a token in the environment's variables and
+configuring a git credential helper in the setup script. Those variables are visible
+to anyone using the environment, and nothing here is worth that.
 
 When something from the kit does not seem to work, check that first:
 
