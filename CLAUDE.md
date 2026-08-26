@@ -27,6 +27,10 @@ So principle 5 holds per environment, not per repository: the committed file
 travels, the install does not. Check `claude plugin list` before concluding that a
 skill is broken.
 
+This is also why the repository stays public (principle 4 is not optional, then):
+the setup script cannot install the plugin from a private repository, and it fails
+silently into a snapshot that every later session reuses.
+
 ## Design principles
 
 1. **Content goes in skills; agents stay thin.** Skills follow an open spec that
