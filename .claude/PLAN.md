@@ -32,10 +32,9 @@ Ordered by impact: this is a flat set of independent work, not a phased project.
 - **2026-08-27 — `uix-expert` is read-only.** It reviews; the change belongs to
   whoever asked. Rules out it running the app — it asks for a screenshot or for
   `webtester` instead.
+- **2026-08-27 — The plan keeps no "done" section.** Finished work becomes a
+  decision, a constraint in `CLAUDE.md`, or nothing at all; the diff is the record.
+  A done list is the section that rots first and drags the rest of the file's
+  credibility with it. Decisions are superseded, never edited, borrowed from ADRs.
 - **2026-08-27 — Principle 6 judges scope, not line count.** A line budget rewards
   dense prose over clear prose and invites splitting to satisfy a number.
-
-## Done
-
-- **Canary skill removed.** The install path is proven end to end; keeping it cost
-  ~110 tokens per session for a question nobody asks.

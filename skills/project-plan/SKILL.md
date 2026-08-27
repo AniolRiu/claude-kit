@@ -12,6 +12,10 @@ what changed; neither says what was chosen over what, or what is waiting on whom
 It is only worth having if it is true. A stale plan is worse than no plan, because
 someone acts on it.
 
+The design constraint is that **someone arriving cold — a person after two months, or
+an agent with no history — can read the whole thing in under a minute and know what
+to do next.** Every rule below follows from that, including the ones that feel severe.
+
 ## 1. Find it before creating one
 
 Look for what the project already uses — `docs/todo.md`, `ROADMAP.md`, `PLAN.md`, a
@@ -46,17 +50,29 @@ open question, it is an opinion — leave it out.
 matters, one for what it rules out. This is the part that earns the file: the reason
 is what stops the same argument being had again in three months.
 
-**Done.** One line for what changed as a result — and only when that differs from
-what the entry predicted. When the work went as written, the diff is the record:
-delete the entry.
+An approach that was **tried and failed** is a decision too — the most valuable kind,
+because without it someone tries it again. Record what was attempted and what it cost.
+
+**Decisions are never edited.** When one is reversed, add a new dated entry that names
+the one it replaces, and mark the old one superseded rather than deleting it. Editing
+in place destroys exactly what the file was for: why the other thing was chosen at the
+time. (This is the one rule worth borrowing wholesale from Architecture Decision
+Records. When a project accumulates enough of them, graduate to `docs/adr/` — one file
+per decision — and leave the plan holding only pending work and open questions.)
+
+**Finished work does not get a section.** It either produced knowledge — in which case
+it is a decision, or a constraint that belongs in the project's `CLAUDE.md` — or it did
+not, in which case the diff is the record and the entry is deleted. A "done" list is
+how these documents die: it grows, nobody reads it, and its dead weight makes people
+stop trusting the sections that matter.
 
 ## 4. When to write
 
 In the same turn as the work. Not at the end of the session, not when asked. An
 entry written later is written from memory, and it is the *why* that gets lost first.
 
-- **Finished something** → move it to Done with the line about what changed, or
-  delete it if there is nothing to add.
+- **Finished something** → delete the entry, unless it taught something; then write
+  that as a decision or a constraint first.
 - **Took a decision** → record it with its reason before moving on. A decision
   without a reason is not a decision; it is a fact that will be re-litigated.
 - **Deferred a decision** → it becomes an open question, with what it blocks. A
@@ -78,8 +94,22 @@ become a backlog — and a backlog belongs in an issue tracker, not here.
 - Never leave an entry that is neither current nor deleted. "Maybe later" items are
   the ones that make people stop trusting the file.
 
-## What this is not
+## What goes somewhere else
 
-Not a changelog, not a design document, and not a diary of what was done in each
-session. It answers one question — where does this project stand and what is
-undecided — and everything that does not serve that answer makes it worse at it.
+The file survives only if this boundary is enforced. Everything below is a real thing
+worth writing down, and none of it belongs here:
+
+| That | Goes to |
+|---|---|
+| How to work in this repo, conventions, invariants, a constraint discovered the hard way | the project's `CLAUDE.md` |
+| A bug, or work with an owner and a due date | the issue tracker |
+| What shipped, and when | the changelog, or git |
+| The full argument behind a large decision | a design document, linked in one line from here |
+
+## Not this
+
+No owners, no status fields, no priorities, no estimates, no risk register, no
+tech-debt section. Each is an issue tracker growing inside a markdown file, and a
+document with fields is a document nobody updates. If the project genuinely needs
+those, it needs a tracker, and the plan shrinks to what a tracker is bad at: what is
+undecided, and why things were chosen.
