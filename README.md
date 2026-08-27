@@ -143,6 +143,15 @@ to share with the implementation mode, where "it already works" always wins.
 - Is **read-only**: it does not edit the code and cannot run the app. When a state
   can only be judged by seeing it, it asks for a screenshot or for `webtester`.
 
+### `project-plan` (skill)
+
+Keeps one document per project of what is pending and what is still undecided —
+adopting whatever planning file the project already has, or creating `.claude/PLAN.md`.
+Entries are one line; a decision is recorded with its reason at the moment it is
+taken; pending work and open questions are state and get deleted rather than
+archived, while decisions are kept. This repo's own is in
+[`.claude/PLAN.md`](.claude/PLAN.md).
+
 ### `firebase-emulator` (skill)
 
 Turns a Firestore project into something you can actually test against. It
@@ -176,6 +185,7 @@ agents/
 skills/
   web-testing/SKILL.md
   ui-ux/SKILL.md
+  project-plan/SKILL.md
   firebase-emulator/SKILL.md
 project-template/
   settings.json       drop into a project's .claude/ to enable the plugin
