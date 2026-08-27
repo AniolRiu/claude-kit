@@ -143,12 +143,6 @@ to share with the implementation mode, where "it already works" always wins.
 - Is **read-only**: it does not edit the code and cannot run the app. When a state
   can only be judged by seeing it, it asks for a screenshot or for `webtester`.
 
-### `plugin-smoke-test` (skill) — temporary
-
-A canary. Asking `vols arròs?` should get back `pikachu` and nothing else, which
-proves the plugin reached the project and that its skills trigger on their own.
-Delete it once that has been confirmed.
-
 ### `firebase-emulator` (skill)
 
 Turns a Firestore project into something you can actually test against. It
@@ -183,7 +177,6 @@ skills/
   web-testing/SKILL.md
   ui-ux/SKILL.md
   firebase-emulator/SKILL.md
-  plugin-smoke-test/SKILL.md   temporary canary, delete after checking
 project-template/
   settings.json       drop into a project's .claude/ to enable the plugin
   README.md           and the install step that settings alone does not do
