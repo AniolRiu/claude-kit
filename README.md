@@ -18,6 +18,13 @@ claude plugin marketplace add AniolRiu/claude-kit
 claude plugin install claude-kit@aniol
 ```
 
+That is once per machine, not once per project: the install lives in `~/.claude/`
+and stays there. Then turn on auto-update — `/plugin` → **Marketplaces** → `aniol`
+→ **Enable auto-update** — because third-party marketplaces have it **off** by
+default, and without it a machine keeps whatever version it installed on the day,
+indefinitely, while cloud sessions move on. `/plugin marketplace update aniol`
+refreshes it by hand.
+
 To make a project ask for it, copy
 [`project-template/settings.json`](project-template/settings.json) into that
 project's `.claude/settings.json`:
