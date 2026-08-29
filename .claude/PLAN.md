@@ -57,6 +57,10 @@ Ordered by impact: this is a flat set of independent work, not a phased project.
   a trailer win: that exception was the environment overruling the kit through the back
   door, which the decision below rules out. The repository's owner decides what its
   history looks like.
+- **2026-08-29 — The plugin version gets bumped with every shipped change.** `claude
+  plugin update` and auto-update compare `version` in `plugin.json`, not commits, so at
+  0.1.0 every existing install silently kept the copy it first fetched. Cloud sessions
+  hid it: their setup script installs fresh rather than updating.
 - **2026-08-29 — The user's rules outrank the environment's.** This session's harness
   instructs the agent to commit and push its work; the kit says never to commit unasked.
   The kit wins: work waits in the working tree with its message proposed. Rules out

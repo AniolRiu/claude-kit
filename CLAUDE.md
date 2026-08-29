@@ -130,5 +130,12 @@ rule actually calls for one. Inside a plugin, reference bundled files through
 claude plugin validate .
 ```
 
+**Bump `version` in `.claude-plugin/plugin.json` with every change worth shipping.**
+`claude plugin update` and auto-update compare that number, not commits: leave it alone
+and every existing install stays on the copy it first fetched, silently, however many
+times the marketplace is refreshed. Cloud environments hide this — their setup script
+installs into a fresh container rather than updating — so it only bites the machines you
+use every day.
+
 Also check by hand: no secrets, no project names, no absolute paths, and no skill
 that has quietly grown into two.

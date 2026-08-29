@@ -215,3 +215,7 @@ project-template/
 ```bash
 claude plugin validate .
 ```
+
+Bump `version` in `.claude-plugin/plugin.json` when shipping a change: updates compare
+that number, not commits, and an unchanged version means no existing install ever sees
+the change.

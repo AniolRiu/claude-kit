@@ -1,6 +1,6 @@
 {
   "name": "claude-kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Personal Claude Code kit: agents, skills and cross-project methods, built around testing against a real local environment instead of something deployed.",
   "author": {
     "name": "Aniol"
