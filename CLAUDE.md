@@ -31,6 +31,15 @@ This is also why the repository stays public (principle 4 is not optional, then)
 the setup script cannot install the plugin from a private repository, and it fails
 silently into a snapshot that every later session reuses.
 
+## This repo follows its own rules
+
+@project-template/CLAUDE.md
+
+The fragment the kit hands to other projects applies here too — most of all here, since
+this is where its rules get argued about. Imported rather than copied, so the two cannot
+drift apart. Imports load at session start, so a change to it takes effect in the next
+session, not this one.
+
 ## Design principles
 
 1. **Content goes in skills; agents stay thin.** Skills follow an open spec that

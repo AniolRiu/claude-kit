@@ -6,6 +6,11 @@ Ordered by impact: this is a flat set of independent work, not a phased project.
 
 - Decide whether `uix-expert` writes its findings into the project it reviews.
   Blocked on the open question below; nothing else waits on it.
+- Reconsider the `PreToolUse` hook for commits. It was ruled out on the grounds that the
+  skill already requires proposing messages first; the same day, the agent broke that
+  rule twice within minutes of writing it, because a skill only reaches a session when it
+  is judged relevant and had not been loaded at all. Blocks nothing, but it is the one
+  rule whose failure is written into history.
 - Check whether `firebase-emulator`'s rules section should shrink to a pointer now that
   `firestore-rules` exists. The two have overlapped since 2026-08-29 and the emulator
   skill is the longest in the kit at 261 lines.

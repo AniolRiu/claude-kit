@@ -1,13 +1,12 @@
-# Fragment for a project's CLAUDE.md
+<!--
+Rules that must apply in every session, which a skill cannot guarantee because a skill
+only loads when it is judged relevant. Everything else — how to commit, how to keep the
+plan, how to test — lives in the claude-kit skills and loads when needed.
 
-Paste the section below into the project's own `CLAUDE.md`. It holds the rules that
-have to apply in every session, which a skill cannot guarantee because a skill only
-loads when it is judged relevant.
-
-Everything else — how to actually commit, how to keep the plan, how to test — lives in
-the `claude-kit` skills and loads when it is needed.
-
----
+Two ways to adopt this in a project: paste the section below into the project's own
+CLAUDE.md, or import this file from it with `@path/to/CLAUDE.md`. HTML comments like
+this one are stripped before the file reaches the model, so they cost no context.
+-->
 
 ## How we work
 
