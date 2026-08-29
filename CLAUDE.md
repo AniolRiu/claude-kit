@@ -133,9 +133,21 @@ claude plugin validate .
 **Bump `version` in `.claude-plugin/plugin.json` with every change worth shipping.**
 `claude plugin update` and auto-update compare that number, not commits: leave it alone
 and every existing install stays on the copy it first fetched, silently, however many
-times the marketplace is refreshed. Cloud environments hide this — their setup script
-installs into a fresh container rather than updating — so it only bites the machines you
-use every day.
+times the marketplace is refreshed.
+
+A **new** cloud session is not affected: its setup script runs on each fresh container
+and installs from a fresh clone, so it gets whatever `main` holds at that moment,
+version number or not. Nothing has to be rebuilt by hand.
+
+What does go stale is a session **resumed** into its old container. `installed_plugins.json`
+records the commit SHA that container fetched, and resuming restores it verbatim — skills
+that no longer exist are still there, skills added since are still missing. Measured here:
+a session installed at 0.1.0 was still serving it two days later, while a session created
+minutes afterwards came up at 0.2.0.
+
+So when a skill seems broken, check `claude plugin list` against
+`.claude-plugin/plugin.json` before looking anywhere else. In an old session the fix is to
+open a new one, not to debug the skill.
 
 Also check by hand: no secrets, no project names, no absolute paths, and no skill
 that has quietly grown into two.
