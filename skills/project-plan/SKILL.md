@@ -50,6 +50,11 @@ open question, it is an opinion — leave it out.
 matters, one for what it rules out. This is the part that earns the file: the reason
 is what stops the same argument being had again in three months.
 
+**An inclination is not a decision.** While a question is still being explored, it stays
+in Open questions — "leaning towards A", "A or B, unresolved" — however clear the
+direction feels. Only what was explicitly closed goes in Decided. Writing a preference
+down as settled is how a conversation gets a conclusion nobody actually reached.
+
 An approach that was **tried and failed** is a decision too — the most valuable kind,
 because without it someone tries it again. Record what was attempted and what it cost.
 
@@ -77,6 +82,8 @@ entry written later is written from memory, and it is the *why* that gets lost f
   without a reason is not a decision; it is a fact that will be re-litigated.
 - **Deferred a decision** → it becomes an open question, with what it blocks. A
   deferral that is not written down is indistinguishable from an oversight.
+- **Leaning one way** → that is an open question with a note on the leaning, not an
+  entry in Decided.
 - **Found new work mid-task** → write it down instead of doing it. That is most of
   the value: the plan is where scope goes to wait instead of growing the change in
   front of you.

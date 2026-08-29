@@ -1,6 +1,6 @@
 ---
 name: web-testing
-description: Verify that a web app actually works end-to-end by driving a real browser with Playwright against the LOCAL instance. Use when a user-facing feature has just been implemented or changed, when an auth or permission flow needs confirming, when a bug report needs reproducing through the UI, or when checking that a user journey has not regressed. Covers finding the documented local environment and refusing to guess it, writing throwaway scripts, selecting by role and label, waiting for state, classifying a failure as app bug / test bug / incomplete environment, and keeping durable flow knowledge. Not for performance benchmarking, load testing, or unit-level assertions.
+description: Verify that a web app actually works end-to-end by driving a real browser with Playwright against the LOCAL instance. Use after a refactor, which the build cannot validate — it compiles green with routes, payload keys, DOM ids and anything visual broken. Use when a user-facing feature has just been implemented or changed, when an auth or permission flow needs confirming, when a bug report needs reproducing through the UI, or when checking that a user journey has not regressed. Covers finding the documented local environment and refusing to guess it, writing throwaway scripts, selecting by role and label, waiting for state, classifying a failure as app bug / test bug / incomplete environment, and keeping durable flow knowledge. Not for performance benchmarking, load testing, or unit-level assertions.
 ---
 
 # Web testing against a real local environment
@@ -8,6 +8,17 @@ description: Verify that a web app actually works end-to-end by driving a real b
 Drive a real browser against the app to find out whether it actually works. This
 is investigation, not test-suite authorship: write throwaway Playwright scripts,
 run them, and report what is true.
+
+## Why the build is not evidence
+
+**A refactor is not finished until a browser has been through it.** The build does not
+cover routes, the keys of a payload sent to a cloud function, DOM ids, or anything
+visual: it compiles exactly as green with all of those broken.
+
+Three broke at once in a single change — the keys of a shorthand object going to a
+callable, a name leaking into the title bar, and a map going blank past a zoom level.
+The build caught none of them and neither did reading the diff. All three were found by
+someone clicking.
 
 ## 1. Local only. Always.
 

@@ -18,3 +18,8 @@ snapshotted, so it is paid once per environment. A `SessionStart` hook is too la
 it runs after Claude Code has already loaded its plugins.
 
 Verify with `claude plugin list`.
+
+`CLAUDE.md` here is a **fragment**, not a file to copy whole: paste its section into the
+project's own `CLAUDE.md`. It carries the rules that must hold in every session — never
+committing unasked, keeping options open, being critical rather than agreeable — which a
+skill cannot guarantee, because a skill only loads when it is judged relevant.

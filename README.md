@@ -143,6 +143,21 @@ to share with the implementation mode, where "it already works" always wins.
 - Is **read-only**: it does not edit the code and cannot run the app. When a state
   can only be judged by seeing it, it asks for a screenshot or for `webtester`.
 
+### `commit` (skill)
+
+How to consolidate work once asked: read the diff before writing the message, clean what
+should not ship, check it builds, split by reason for change, and propose every message —
+all of them at once, with their files — before running git. Deciding *whether* to commit
+is not in it: that is the user's, and the rule lives in the `CLAUDE.md` fragment below,
+because a skill only loads when it is judged relevant and that rule has to hold always.
+
+### `firestore-rules` (skill)
+
+Writing Firestore and Storage rules and proving them against the emulator. The premise is
+that the client is not a security boundary — a hidden button is not an authorization
+check — and the weight of the skill is on the negative cases: a suite that only tests what
+should work is passed perfectly by rules that allow everything.
+
 ### `project-plan` (skill)
 
 Keeps one document per project of what is pending and what is still undecided —
@@ -186,9 +201,12 @@ skills/
   web-testing/SKILL.md
   ui-ux/SKILL.md
   project-plan/SKILL.md
+  commit/SKILL.md
   firebase-emulator/SKILL.md
+  firestore-rules/SKILL.md
 project-template/
   settings.json       drop into a project's .claude/ to enable the plugin
+  CLAUDE.md           fragment to paste into the project's own CLAUDE.md
   README.md           and the install step that settings alone does not do
 ```
 
