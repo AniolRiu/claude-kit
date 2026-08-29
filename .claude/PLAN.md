@@ -16,6 +16,9 @@ Ordered by impact: this is a flat set of independent work, not a phased project.
   skill is the longest in the kit at 261 lines.
 - Watch the kit's always-on cost. It was ~1,000 tokens with three skills; there are now
   six. If it passes ~2,000 per session, shorten descriptions without losing the *when*.
+  The `project-template` fragment is the other half of the bill and grew by a third on
+  2026-08-29; measured together they were 2.8k that day. Descriptions are not where the
+  next cut necessarily is.
 - Consider a `SessionStart` hook that prints the project's plan when one exists.
   Without it, this skill's "keep it updated" depends on the model noticing.
 
