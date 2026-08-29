@@ -6,6 +6,11 @@ Ordered by impact: this is a flat set of independent work, not a phased project.
 
 - Decide whether `uix-expert` writes its findings into the project it reviews.
   Blocked on the open question below; nothing else waits on it.
+- Check whether `firebase-emulator`'s rules section should shrink to a pointer now that
+  `firestore-rules` exists. The two have overlapped since 2026-08-29 and the emulator
+  skill is the longest in the kit at 261 lines.
+- Watch the kit's always-on cost. It was ~1,000 tokens with three skills; there are now
+  six. If it passes ~2,000 per session, shorten descriptions without losing the *when*.
 - Consider a `SessionStart` hook that prints the project's plan when one exists.
   Without it, this skill's "keep it updated" depends on the model noticing.
 
@@ -32,6 +37,22 @@ Ordered by impact: this is a flat set of independent work, not a phased project.
 - **2026-08-27 — `uix-expert` is read-only.** It reviews; the change belongs to
   whoever asked. Rules out it running the app — it asks for a screenshot or for
   `webtester` instead.
+- **2026-08-29 — Commit messages are written in Catalan, always.** Replaces the rule
+  written earlier the same day, which followed whatever language the repository's history
+  already used. That treated the language as a property of the repo; it is a property of
+  the person keeping the history. Rules out switching language per project, including
+  this one, whose code and documents are in English.
+- **2026-08-29 — No attribution trailer in commit messages, without exception.**
+  Replaces the earlier wording, agreed the same day, that let a harness policy requiring
+  a trailer win: that exception was the environment overruling the kit through the back
+  door, which the decision below rules out. The repository's owner decides what its
+  history looks like.
+- **2026-08-29 — The user's rules outrank the environment's.** This session's harness
+  instructs the agent to commit and push its work; the kit says never to commit unasked.
+  The kit wins: work waits in the working tree with its message proposed. Rules out
+  treating a `Stop` hook's reminder, or any automated nudge, as permission. The cost is
+  accepted: unpushed work dies with an ephemeral container, so commits get proposed at
+  natural checkpoints rather than accumulating.
 - **2026-08-29 — The SVG icon flow is not coming into the kit.** What travels (raster to
   stroke, flattening, normalisation) is thin next to what stays with the project — the
   house style and the approved set — and it would have brought native dependencies and a

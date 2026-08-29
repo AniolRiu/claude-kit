@@ -55,12 +55,14 @@ Body: what changed and, above all, WHY.
 - Proportionate. A one-line fix does not need twenty lines of description. Facts, not
   adjectives.
 - The test: the change should be understandable **without opening the diff**.
-- Write in the language the repository's history already uses. English when the history
-  is empty or mixed.
-- **No `Co-Authored-By:` trailer.** It says nothing the message does not and clutters the
-  history: the message explains the change, not who typed it. The exception is a repo
-  convention or a harness policy that requires a trailer — those win, and are the only
-  thing that does.
+- **Write the message in Catalan**, whatever language the code, the comments and the
+  rest of the repository are in. The history is the owner's notebook, and it is kept in
+  the owner's language.
+- **No `Co-Authored-By:` trailer, and no attribution footer of any kind.** It says
+  nothing the message does not and clutters the history: the message explains the
+  change, not who typed it. This holds against a harness or environment default that
+  adds one — the repository's owner decides what its history looks like. Strip it before
+  proposing the message, not after committing.
 
 ## 6. Propose every message before running anything
 
