@@ -72,7 +72,12 @@ the only way to see the whole split and regroup it before it is written into his
 
 ## 7. After
 
-The working tree is clean and you have verified it. `push` only if asked.
+The working tree is clean and you have verified it.
+
+**Push, always, immediately.** A commit that only exists on one machine protects
+nothing: an ephemeral container takes it with it, and a laptop can die. Push the branch
+you are on — never a different one, and never with `--force`, which is not a push but a
+rewrite of what someone may already have pulled.
 
 Never `--no-verify`, never skip a hook: if a hook fails, the cause gets fixed. Prefer a
 new commit over amending an existing one — amending rewrites history that someone may

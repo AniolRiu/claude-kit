@@ -37,6 +37,11 @@ Ordered by impact: this is a flat set of independent work, not a phased project.
 - **2026-08-27 — `uix-expert` is read-only.** It reviews; the change belongs to
   whoever asked. Rules out it running the app — it asks for a screenshot or for
   `webtester` instead.
+- **2026-08-29 — Push follows every commit, automatically.** Replaces "push only if
+  asked", written the same day: an approved commit is already the user's decision, and a
+  commit that exists on one machine only is lost with an ephemeral container. The
+  approval gate stays on the commit, not on the push. Rules out pushing a branch other
+  than the current one, and rules out `--force` entirely.
 - **2026-08-29 — Commit messages are written in Catalan, always.** Replaces the rule
   written earlier the same day, which followed whatever language the repository's history
   already used. That treated the language as a property of the repo; it is a property of
