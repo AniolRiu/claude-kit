@@ -135,19 +135,25 @@ claude plugin validate .
 and every existing install stays on the copy it first fetched, silently, however many
 times the marketplace is refreshed.
 
-A **new** cloud session is not affected: its setup script runs on each fresh container
-and installs from a fresh clone, so it gets whatever `main` holds at that moment,
-version number or not. Nothing has to be rebuilt by hand.
+A cloud session does not pick that up on its own, and opening a new one does not help.
+The setup script runs **once per environment** and its result is snapshotted: every later
+session starts from the version installed when that snapshot was taken. Measured here: a
+snapshot from the 27th was still serving 0.1.0 on the 31st, with `main` at 0.2.0, in a
+container whose clone of this repo was minutes old.
 
-What does go stale is a session **resumed** into its old container. `installed_plugins.json`
-records the commit SHA that container fetched, and resuming restores it verbatim — skills
-that no longer exist are still there, skills added since are still missing. Measured here:
-a session installed at 0.1.0 was still serving it two days later, while a session created
-minutes afterwards came up at 0.2.0.
+That is why the committed `.claude/settings.json` carries a `SessionStart` hook running
+`claude plugin update` — for **both** scopes, since `enabledPlugins` produces a
+*project*-scope install that the default `user` scope leaves alone. The hook travels with
+the clone, which *is* fresh every session, and does not depend on the installed version.
+
+What the hook does not do is fix its own session: measured, it takes the install from
+0.1.0 to 0.2.0 on disk while that same session keeps serving the old skills — hooks run
+after Claude Code has loaded its plugins. It leaves the container correct from then on.
+Whether an interactive session picks the new skills up in flight is untested; updating by
+hand mid-session did refresh them once.
 
 So when a skill seems broken, check `claude plugin list` against
-`.claude-plugin/plugin.json` before looking anywhere else. In an old session the fix is to
-open a new one, not to debug the skill.
+`.claude-plugin/plugin.json` before looking anywhere else.
 
 Also check by hand: no secrets, no project names, no absolute paths, and no skill
 that has quietly grown into two.
