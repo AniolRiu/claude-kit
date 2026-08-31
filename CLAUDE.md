@@ -146,11 +146,12 @@ That is why the committed `.claude/settings.json` carries a `SessionStart` hook 
 *project*-scope install that the default `user` scope leaves alone. The hook travels with
 the clone, which *is* fresh every session, and does not depend on the installed version.
 
-What the hook does not do is fix its own session: measured, it takes the install from
-0.1.0 to 0.2.0 on disk while that same session keeps serving the old skills — hooks run
-after Claude Code has loaded its plugins. It leaves the container correct from then on.
-Whether an interactive session picks the new skills up in flight is untested; updating by
-hand mid-session did refresh them once.
+Measured, twice: in an interactive session the hook does fix the session it runs in — at
+startup, not mid-session: a release published while a session is open waits for the next. It
+took the install from 0.2.0 to 0.2.1 in both scopes and the new skill descriptions were
+live in that same session, despite the CLI printing "Restart to apply changes" — skills
+are re-read, plugins are not reloaded. In a headless `claude -p` run the same hook updates
+the disk and the session keeps serving the old skills.
 
 So when a skill seems broken, check `claude plugin list` against
 `.claude-plugin/plugin.json` before looking anywhere else.
