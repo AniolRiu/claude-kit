@@ -13,88 +13,145 @@ gets in.
 
 ## Install
 
+Three pieces, and the kit only behaves as intended with all three:
+
+| Piece | Where it lives | Paid |
+|---|---|---|
+| The install itself | `~/.claude/` of a machine or a container | once per machine, once per cloud environment |
+| The project opting in | `.claude/settings.json`, committed | once per project |
+| Staying current | a `SessionStart` hook in that same file | free, every session |
+
+### 1. The install
+
+On your own machine:
+
 ```bash
 claude plugin marketplace add AniolRiu/claude-kit
 claude plugin install claude-kit@aniol
 ```
 
-That is once per machine, not once per project: the install lives in `~/.claude/`
-and stays there. Then turn on auto-update — `/plugin` → **Marketplaces** → `aniol`
-→ **Enable auto-update** — because third-party marketplaces have it **off** by
-default, and without it a machine keeps whatever version it installed on the day,
-indefinitely, while cloud sessions move on. `/plugin marketplace update aniol`
-refreshes it by hand.
+Once per machine, not once per project: it lives in `~/.claude/` and stays there.
 
-To make a project ask for it, copy
-[`project-template/settings.json`](project-template/settings.json) into that
-project's `.claude/settings.json`:
+For a **cloud environment** that same `~/.claude/` belongs to the container, and no
+committed file can create it. It goes in the **Setup script** field of the environment
+dialog at claude.ai/code:
+
+```bash
+#!/bin/bash
+# bump this number to force the snapshot to rebuild: 1
+{
+  claude plugin marketplace add AniolRiu/claude-kit
+  claude plugin install claude-kit@aniol
+  claude plugin update claude-kit@aniol
+  claude plugin list
+} > /var/log/claude-kit-setup.log 2>&1 || true
+```
+
+The `|| true` matters: a setup script that exits non-zero stops the session starting.
+Keep the log — it is the only record of what the environment was built with, and it
+survives into every session made from that snapshot.
+
+That script runs as root before Claude Code launches, and Anthropic snapshots the
+filesystem afterwards. **It is paid once per environment and the result is frozen**:
+every later session, new or resumed, starts with the version installed the day the
+snapshot was taken, however far `main` has moved on. Measured: a snapshot from the 27th
+was still serving 0.1.0 on the 31st with `main` at 0.2.0, in a container whose clone of
+this repo was minutes old. What forces a rebuild is the script's **text** changing —
+hence the number to bump in the comment.
+
+### 2. The project opts in
+
+Copy [`project-template/settings.json`](project-template/settings.json) into the
+project's `.claude/settings.json` and commit it. It registers the marketplace, enables
+the plugin, and carries the hook from step 3.
+
+**The `enabledPlugins` part is not enough on its own.** Since Claude Code 2.1.195 it
+registers the marketplace and marks the plugin as enabled, but a plugin from an external
+source is not installed by settings alone — it does not load until someone has run the
+install from step 1 on that machine or in that environment. Nothing warns you in
+conversation: the skills are simply absent, and Claude answers as if the kit did not
+exist. `claude plugin list` is the check.
+
+### 3. Staying current
+
+The `SessionStart` hook in that same file is what keeps a session on the published
+version instead of the installed one:
 
 ```json
-{
-  "extraKnownMarketplaces": {
-    "aniol": {
-      "source": { "source": "github", "repo": "AniolRiu/claude-kit" }
+"hooks": {
+  "SessionStart": [
+    {
+      "matcher": "startup|resume",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "claude plugin marketplace update aniol >/dev/null 2>&1; { claude plugin update claude-kit@aniol; claude plugin update claude-kit@aniol --scope project; } 2>&1 | grep -o 'updated from .*' || true",
+          "timeout": 90
+        }
+      ]
     }
-  },
-  "enabledPlugins": {
-    "claude-kit@aniol": true
-  }
+  ]
 }
 ```
 
-**That file is not enough on its own.** Since Claude Code 2.1.195 it registers the
-marketplace and marks the plugin as enabled, but a plugin from an external source
-is not installed by settings alone — it does not load until someone runs
-`claude plugin install claude-kit@aniol` on that machine. Nothing warns you in
-conversation: the skills are simply absent, and Claude answers as if the kit did
-not exist.
+It lives in the repository and **not inside the plugin** on purpose: it has to work when
+the installed copy is old, and an old copy would not carry it. The clone *is* fresh every
+session; the snapshot is not.
 
-For **cloud sessions** the install lives in the container's `~/.claude/`, which no
-committed file can create. It goes in the **Setup script** field of the cloud
-environment (the environment dialog at claude.ai/code):
+It updates **both scopes**. `enabledPlugins` produces a *project*-scope install and
+`claude plugin update` touches only `user` by default, so with a single line the install
+that actually loads is the one left behind.
 
-```bash
-claude plugin marketplace add AniolRiu/claude-kit || true
-claude plugin install claude-kit@aniol || true
-```
+Measured three times, in two repositories: at session start the hook takes both scopes
+from the snapshot's version up to the published one, and the new skills are live **in
+that same session**, despite the CLI printing `Restart to apply changes` — skills are
+re-read even though plugins are not reloaded. Two limits worth knowing:
 
-That script runs as root before Claude Code launches, and Anthropic snapshots the
-filesystem afterwards — so this is paid **once per environment**, not once per
-session, and every later session starts with the kit already installed. The
-`|| true` matters: a setup script that exits non-zero stops the session starting.
+- A headless `claude -p` run updates the disk but keeps serving the old skills.
+- A version published while a session is open waits for the next session.
 
-A `SessionStart` hook does **not** work for this, however tempting: it runs *after*
-Claude Code launches, so a plugin installed there is not loaded in that session.
+So **bumping `version` in `.claude-plugin/plugin.json` is what ships a change**, and the
+setup script only needs touching again if you want the snapshot itself rebuilt.
 
-**The repository has to stay public for that to work.** Installing from the setup
-script was tested against a private repository and failed on the clone:
+On your own machine there is no snapshot, so the hook is enough by itself. Auto-update is
+worth turning on anyway — `/plugin` → **Marketplaces** → `aniol` → **Enable auto-update**
+— because third-party marketplaces have it **off** by default;
+`claude plugin marketplace update aniol` refreshes it by hand.
+
+### The repository has to stay public
+
+Installing from the setup script was tested against a private repository and failed on
+the clone:
 
 ```
 fatal: could not read Username for 'https://github.com': terminal prompts disabled
 ```
 
 Inside a running cloud session the proxy injects git credentials, so a private
-marketplace clones fine there. At setup-script time those credentials do not exist
-yet — git got far enough to ask for a username. It is authentication, not protocol:
-the clone was already going over HTTPS, so `CLAUDE_CODE_PLUGIN_PREFER_HTTPS` makes
-no difference.
+marketplace clones fine there. At setup-script time those credentials do not exist yet —
+git got far enough to ask for a username. It is authentication, not protocol: the clone
+was already going over HTTPS, so `CLAUDE_CODE_PLUGIN_PREFER_HTTPS` makes no difference.
 
-The failure is silent: `|| true` keeps the session starting, the snapshot is then
-taken **without** the plugin, and every later session skips the setup script and
-starts broken too. Recovering means changing the script's text, which is what forces
-the snapshot to rebuild — making the repository public again does nothing on its
-own.
+The failure is silent: `|| true` keeps the session starting, the snapshot is then taken
+**without** the plugin, and every later session starts broken too. Recovering means
+changing the script's text, which is what forces the rebuild — making the repository
+public again does nothing on its own.
 
 Keeping it private would mean putting a token in the environment's variables and
-configuring a git credential helper in the setup script. Those variables are visible
-to anyone using the environment, and nothing here is worth that.
+configuring a git credential helper in the setup script. Those variables are visible to
+anyone using the environment, and nothing here is worth that.
 
-When something from the kit does not seem to work, check that first:
+### When something does not work
 
 ```bash
-claude plugin list      # is claude-kit@aniol installed and enabled?
-claude plugin details claude-kit   # which skills and agents it contributes
+claude plugin list                  # installed, enabled, and at which version in each scope
+claude plugin details claude-kit    # which skills and agents it contributes
+cat /var/log/claude-kit-setup.log   # cloud only: what the environment was built with
 ```
+
+Compare the version against `.claude-plugin/plugin.json` on `main` before looking
+anywhere else. Opening a new cloud session does **not** fix an old version — it is a new
+container from the same snapshot.
 
 ## What's inside
 
