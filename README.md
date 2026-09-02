@@ -72,11 +72,18 @@ install from step 1 on that machine or in that environment. Nothing warns you in
 conversation: the skills are simply absent, and Claude answers as if the kit did not
 exist. `claude plugin list` is the check.
 
-That is the whole of it: there is nothing to paste. From the next session the plugin's
-own `SessionStart` hook writes `.claude/rules/how-we-work.md` into the project, and
-Claude Code loads it every session alongside `CLAUDE.md`. Commit the file — it is
-generated and must never be edited by hand, but having it in the repo means the rules
-still hold in a clone where nobody has run step 1.
+That is the whole of it: there is nothing to paste. The plugin carries its own
+`SessionStart` hook, which writes `.claude/rules/how-we-work.md` into the project at
+startup; Claude Code reads memory files before hooks run, so the rules it writes are in
+context from the following session on. Commit the file — it is generated and must never
+be edited by hand, but having it in the repo means the rules still hold in a clone where
+nobody has run step 1.
+
+That also means the two `SessionStart` hooks are one behind each other. Plugins load
+before hooks run, so the plugin hook that fires in a session is the one from the version
+installed when it started — not the one step 3 has just fetched. Going from a version
+without the hook to one with it therefore takes two sessions: the first updates the
+plugin, the second writes the rules.
 
 ### 3. Staying current
 

@@ -22,6 +22,8 @@ Verify with `claude plugin list`.
 The rules that must hold in every session — the language split, never committing unasked,
 keeping options open, being critical rather than agreeable — are no longer pasted
 anywhere. They live in the plugin at `rules/how-we-work.md`, and its `SessionStart` hook
-writes them into this project as `.claude/rules/how-we-work.md`, which Claude Code loads
-every session. Commit that file: it is generated, so never edit it, but keeping it in the
-repo means the rules still hold on a machine where the install is missing.
+writes them into this project as `.claude/rules/how-we-work.md` at startup. Claude Code
+reads memory files before hooks run, so a freshly written or refreshed copy is in context
+from the following session on. Commit that file: it is generated, so never edit it, but
+keeping it in the repo means the rules still hold on a machine where the install is
+missing.
