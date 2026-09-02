@@ -1,14 +1,22 @@
 <!--
-Rules that must apply in every session, which a skill cannot guarantee because a skill
+The rules that must hold in every session, which a skill cannot guarantee because a skill
 only loads when it is judged relevant. Everything else — how to commit, how to keep the
 plan, how to test — lives in the claude-kit skills and loads when needed.
 
-Two ways to adopt this in a project: paste the section below into the project's own
-CLAUDE.md, or import this file from it with `@path/to/CLAUDE.md`. HTML comments like
+This file is the canonical text and lives inside the plugin. The SessionStart hook in
+hooks/hooks.json copies it into each project as .claude/rules/how-we-work.md, where
+Claude Code loads it every session. Edit it here; never edit a copy. HTML comments like
 this one are stripped before the file reaches the model, so they cost no context.
 -->
 
 ## How we work
+
+### Catalan to me, English in the files
+
+Talk to me in Catalan. Write in English everything that ends up in a file — code,
+comments, documents, plans, agent prompts, skill bodies, READMEs. The code and its
+readers are English-speaking; the conversation is not. The one exception is commit
+messages, which are Catalan always: the history is my notebook, not the repository's.
 
 ### Consolidating is mine, not yours
 

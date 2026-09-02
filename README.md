@@ -72,6 +72,12 @@ install from step 1 on that machine or in that environment. Nothing warns you in
 conversation: the skills are simply absent, and Claude answers as if the kit did not
 exist. `claude plugin list` is the check.
 
+That is the whole of it: there is nothing to paste. From the next session the plugin's
+own `SessionStart` hook writes `.claude/rules/how-we-work.md` into the project, and
+Claude Code loads it every session alongside `CLAUDE.md`. Commit the file — it is
+generated and must never be edited by hand, but having it in the repo means the rules
+still hold in a clone where nobody has run step 1.
+
 ### 3. Staying current
 
 The `SessionStart` hook in that same file is what keeps a session on the published
@@ -205,8 +211,23 @@ to share with the implementation mode, where "it already works" always wins.
 How to consolidate work once asked: read the diff before writing the message, clean what
 should not ship, check it builds, split by reason for change, and propose every message —
 all of them at once, with their files — before running git. Deciding *whether* to commit
-is not in it: that is the user's, and the rule lives in the `CLAUDE.md` fragment below,
+is not in it: that is the user's, and that rule lives in `rules/how-we-work.md` instead,
 because a skill only loads when it is judged relevant and that rule has to hold always.
+
+### `rules/how-we-work.md`
+
+The rules that have to hold in every session, whatever the conversation is about: the
+language split, never committing unasked, keeping options open, saying only what changes
+something, being critical rather than agreeable. They are not a skill on purpose — a
+skill loads only when it is judged relevant, and these have to be there before anyone
+knows the session will need them.
+
+A plugin cannot ship a `CLAUDE.md`; it can ship a hook. So the canonical text lives here
+and the plugin's `SessionStart` hook copies it into each project as
+`.claude/rules/how-we-work.md`, which Claude Code loads every session at the same
+priority as `.claude/CLAUDE.md`. Edit the file in the plugin and every project picks the
+change up on its next session — the same path as any other change to the kit, and the
+reason the rules are no longer a fragment to paste by hand.
 
 ### `firestore-rules` (skill)
 
@@ -249,7 +270,7 @@ the actual deployment.
 ```
 CLAUDE.md             why this repo exists and what may go in it
 .claude-plugin/
-  plugin.json         claude-kit, v0.1.0
+  plugin.json         claude-kit, v0.3.0
   marketplace.json    marketplace "aniol", one plugin at "./"
 agents/
   webtester.md        identity, and delegation to skills/web-testing
@@ -261,9 +282,12 @@ skills/
   commit/SKILL.md
   firebase-emulator/SKILL.md
   firestore-rules/SKILL.md
+rules/
+  how-we-work.md      the always-on rules, canonical copy
+hooks/
+  hooks.json          SessionStart: writes rules/ into a project's .claude/rules/
 project-template/
   settings.json       drop into a project's .claude/ to enable the plugin
-  CLAUDE.md           fragment to paste into the project's own CLAUDE.md
   README.md           and the install step that settings alone does not do
 ```
 

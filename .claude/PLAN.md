@@ -4,6 +4,11 @@ Ordered by impact: this is a flat set of independent work, not a phased project.
 
 ## Pending
 
+- Check that `.claude/rules/how-we-work.md` survives a `/compact`. The documentation
+  promises re-injection for the root `CLAUDE.md` and reloading for rules with `paths:`,
+  and says nothing about rules without them. If it does not survive, these rules belong in
+  the project's `CLAUDE.md` and the hook has to write a delimited section instead of a
+  file. Checked with `/context` after a compact.
 - Decide whether `uix-expert` writes its findings into the project it reviews.
   Blocked on the open question below; nothing else waits on it.
 - Reconsider the `PreToolUse` hook for commits. It was ruled out on the grounds that the
@@ -35,6 +40,16 @@ Ordered by impact: this is a flat set of independent work, not a phased project.
 
 ## Decided
 
+- **2026-09-02 — The always-on rules ship inside the plugin, not as a fragment to paste.**
+  `rules/how-we-work.md` is the canonical text, and the plugin's `SessionStart` hook copies
+  it into each project as `.claude/rules/how-we-work.md`, which loads every session at the
+  same priority as `.claude/CLAUDE.md`. A plugin cannot contribute a `CLAUDE.md` — the
+  documentation is explicit — but it can contribute hooks. Replaces
+  `project-template/CLAUDE.md`, whose every edit silently left adopters on the old text;
+  the Catalan/English rule added the same day is what exposed it. Rules out `@` importing
+  the clone: relative import paths resolve against the importing file and no cloud
+  container has a clone to point at. The generated copy is committed, so the rules still
+  hold where the install is missing.
 - **2026-08-27 — The repository stays public.** A cloud environment's setup script
   has no git credentials, so it cannot clone a private marketplace; the install
   fails silently into a snapshot every later session reuses. Rules out keeping

@@ -33,12 +33,12 @@ silently into a snapshot that every later session reuses.
 
 ## This repo follows its own rules
 
-@project-template/CLAUDE.md
-
-The fragment the kit hands to other projects applies here too — most of all here, since
-this is where its rules get argued about. Imported rather than copied, so the two cannot
-drift apart. Imports load at session start, so a change to it takes effect in the next
-session, not this one.
+The rules the kit hands to other projects — `rules/how-we-work.md` — apply here too, most
+of all here, since this is where they get argued about. This repo adopts them exactly as
+any other project does: the plugin's `SessionStart` hook copies that file to
+`.claude/rules/how-we-work.md`, which Claude Code loads every session. Edit the canonical
+file, never the copy. The copy is refreshed at session start, so a change lands in the
+next session, not this one.
 
 ## Design principles
 
@@ -116,13 +116,15 @@ existing ones worse. `skills/firebase-emulator/SKILL.md` is the reference.
   marketplace.json    marketplace "aniol", serving this repo as one plugin
 agents/               thin subagents
 skills/               the content: one directory per skill, each with SKILL.md
+rules/                always-on rules, copied into each project by the hook below
+hooks/hooks.json      SessionStart: materialises rules/ into .claude/rules/
 project-template/
   settings.json       drop into a project's .claude/ to enable the plugin
 ```
 
-`hooks/hooks.json`, `commands/` and `scripts/` do not exist yet; add them when a
-rule actually calls for one. Inside a plugin, reference bundled files through
-`${CLAUDE_PLUGIN_ROOT}` — never an absolute path (principle 5).
+`commands/` and `scripts/` do not exist yet; add them when a rule actually calls for
+one. Inside a plugin, reference bundled files through `${CLAUDE_PLUGIN_ROOT}` — never an
+absolute path (principle 5).
 
 ## Checks
 

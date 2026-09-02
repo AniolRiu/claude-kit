@@ -19,7 +19,9 @@ it runs after Claude Code has already loaded its plugins.
 
 Verify with `claude plugin list`.
 
-`CLAUDE.md` here is a **fragment**, not a file to copy whole: paste its section into the
-project's own `CLAUDE.md`. It carries the rules that must hold in every session — never
-committing unasked, keeping options open, being critical rather than agreeable — which a
-skill cannot guarantee, because a skill only loads when it is judged relevant.
+The rules that must hold in every session — the language split, never committing unasked,
+keeping options open, being critical rather than agreeable — are no longer pasted
+anywhere. They live in the plugin at `rules/how-we-work.md`, and its `SessionStart` hook
+writes them into this project as `.claude/rules/how-we-work.md`, which Claude Code loads
+every session. Commit that file: it is generated, so never edit it, but keeping it in the
+repo means the rules still hold on a machine where the install is missing.

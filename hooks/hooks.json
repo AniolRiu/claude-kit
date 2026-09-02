@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "src=\"${CLAUDE_PLUGIN_ROOT}/rules/how-we-work.md\"; dst=\"${CLAUDE_PROJECT_DIR}/.claude/rules/how-we-work.md\"; [ -n \"${CLAUDE_PROJECT_DIR}\" ] && [ -f \"$src\" ] && { cmp -s \"$src\" \"$dst\" || { mkdir -p \"${CLAUDE_PROJECT_DIR}/.claude/rules\" && cp \"$src\" \"$dst\" && echo \"claude-kit: refreshed .claude/rules/how-we-work.md — it loads from the next session on\"; }; }; true",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
