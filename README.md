@@ -282,7 +282,7 @@ the actual deployment.
 ```
 CLAUDE.md             why this repo exists and what may go in it
 .claude-plugin/
-  plugin.json         claude-kit, v0.4.0
+  plugin.json         the plugin manifest
   marketplace.json    marketplace "aniol", one plugin at "./"
 agents/
   webtester.md        identity, and delegation to skills/web-testing

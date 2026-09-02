@@ -132,6 +132,12 @@ absolute path (principle 5).
 claude plugin validate .
 ```
 
+It checks less than it looks like it does. It passed on a manifest that declared
+`"hooks": "./hooks/hooks.json"`, which made every install fail to load with `Duplicate
+hooks file detected` — `hooks/hooks.json` is discovered automatically and the `hooks`
+field is only for files at other paths. The check that catches that class of mistake is
+`claude plugin update` followed by `claude plugin list` on a real install.
+
 **Bump `version` in `.claude-plugin/plugin.json` with every change worth shipping.**
 `claude plugin update` and auto-update compare that number, not commits: leave it alone
 and every existing install stays on the copy it first fetched, silently, however many

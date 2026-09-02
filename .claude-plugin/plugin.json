@@ -1,9 +1,8 @@
 {
   "name": "claude-kit",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Personal Claude Code kit: agents, skills and cross-project methods, built around testing against a real local environment instead of something deployed.",
   "author": {
     "name": "Aniol"
-  },
-  "hooks": "./hooks/hooks.json"
+  }
 }

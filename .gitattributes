@@ -1,0 +1,5 @@
+# The always-on rules are byte-compared by the plugin's SessionStart hook: if a
+# checkout gives the canonical file and a project's copy different line endings,
+# the hook rewrites the copy on every single session. Pin both to LF.
+rules/*.md text eol=lf
+.claude/rules/*.md text eol=lf
