@@ -217,6 +217,10 @@ fixture is reloaded and any local changes are discarded.
 
 Keep it short and literal. Commands that can be pasted, not described.
 
+Write the host that actually answered, not the one you assumed. A dev server often binds
+`localhost` or `127.0.0.1` but not both, and a URL nobody requested is the line that
+sends the next agent hunting a bug that does not exist.
+
 ---
 
 ## 6. Prove it starts
@@ -224,7 +228,13 @@ Keep it short and literal. Commands that can be pasted, not described.
 Do not report this done from having written the files. Actually:
 
 1. Run the start command from the section you just wrote, in a clean shell.
-2. Confirm the emulator UI answers on its port and shows the imported collections.
+2. Request every URL and port the section lists, one at a time, and confirm each answers.
+   **"All emulators ready" is not evidence.** The banner prints once the ports are open,
+   not once every service loaded: Cloud Functions in particular fail quietly, several
+   screens earlier, and leave every callable returning 404. If they do, the usual cause is
+   discovery timing out — `firebase-tools` allows 10 seconds to load the functions module
+   — and `FUNCTIONS_DISCOVERY_TIMEOUT=60` is the fix. The emulator UI must also show the
+   imported collections, or the seed did not load.
 3. Log into the app as `qa@test.local` / `test1234` through the real UI.
 4. Confirm one role restriction behaves as expected — `viewer@test.local` is
    denied something `editor@test.local` can do. That proves the rules file is

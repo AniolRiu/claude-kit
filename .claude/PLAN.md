@@ -18,7 +18,7 @@ Ordered by impact: this is a flat set of independent work, not a phased project.
   rule whose failure is written into history.
 - Check whether `firebase-emulator`'s rules section should shrink to a pointer now that
   `firestore-rules` exists. The two have overlapped since 2026-08-29 and the emulator
-  skill is the longest in the kit at 261 lines.
+  skill is the longest in the kit at 271 lines.
 - Watch the kit's always-on cost. It was ~1,000 tokens with three skills; there are now
   six. If it passes ~2,000 per session, shorten descriptions without losing the *when*.
   The `project-template` fragment is the other half of the bill and grew by a third on

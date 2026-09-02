@@ -185,8 +185,13 @@ conversation's context. The skill works on its own too, without the agent.
   repo's test suite behind your back.
 - Selects by role and label (`getByRole`, `getByLabel`), never by structural CSS.
 - Waits for state, never for time.
-- On failure, classifies it as **app bug / test bug / incomplete environment**, and
-  never weakens an assertion to turn a test green.
+- Verifies the documented environment instead of trusting it: requests every port the
+  section lists, never believes a tool's own "ready" banner, and tries the other loopback
+  name before declaring an app dead.
+- On failure, classifies it as **app bug / test bug / incomplete environment / wrong
+  documentation**, and never weakens an assertion to turn a test green. It reports a
+  false line in `CLAUDE.md` rather than editing it, and never writes the section it
+  found missing — a fabricated test environment turns the guard inside out.
 - Maintains `.claude/webtester/FLOWS.md` with durable knowledge (how login works,
   what the flows are, which selectors are fragile), kept under 200 lines and
   consolidated as it grows. Run logs stay in `/tmp` and are meant to be lost, and
@@ -277,7 +282,7 @@ the actual deployment.
 ```
 CLAUDE.md             why this repo exists and what may go in it
 .claude-plugin/
-  plugin.json         claude-kit, v0.3.0
+  plugin.json         claude-kit, v0.4.0
   marketplace.json    marketplace "aniol", one plugin at "./"
 agents/
   webtester.md        identity, and delegation to skills/web-testing

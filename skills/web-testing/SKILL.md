@@ -1,6 +1,6 @@
 ---
 name: web-testing
-description: Verify that a web app actually works end-to-end by driving a real browser with Playwright against the LOCAL instance. Use after a refactor, which the build cannot validate — it compiles green with routes, payload keys, DOM ids and anything visual broken. Use when a user-facing feature has just been implemented or changed, when an auth or permission flow needs confirming, when a bug report needs reproducing through the UI, or when checking that a user journey has not regressed. Covers finding the documented local environment and refusing to guess it, writing throwaway scripts, selecting by role and label, waiting for state, classifying a failure as app bug / test bug / incomplete environment, and keeping durable flow knowledge. Not for performance benchmarking, load testing, or unit-level assertions.
+description: Verify that a web app actually works end-to-end by driving a real browser with Playwright against the LOCAL instance. Use after a refactor, which the build cannot validate — it compiles green with routes, payload keys, DOM ids and anything visual broken. Use when a user-facing feature has just been implemented or changed, when an auth or permission flow needs confirming, when a bug report needs reproducing through the UI, or when checking that a user journey has not regressed. Covers finding the documented local environment and refusing to guess it, writing throwaway scripts, selecting by role and label, waiting for state, classifying a failure as app bug / test bug / incomplete environment / wrong documentation, and keeping durable flow knowledge. Not for performance benchmarking, load testing, or unit-level assertions.
 ---
 
 # Web testing against a real local environment
@@ -39,6 +39,21 @@ Concretely, before writing a single line of test code:
    hit a timeout. A start that looks stalled usually is not — read the log it is
    writing instead of killing it and retrying. If the section documents more than
    one command, start them in the order given and wait for each.
+
+4. **Prove that section is true before you trust it.** Request the base URL and every
+   port it lists — app, emulator UI, database, auth, storage, functions — and note which
+   answer. A dead service found here costs one line; found later it arrives disguised as
+   an app bug in the first flow that touches it. **Never take the "ready" banner of the
+   thing you just started as evidence**: local backends print it while a sub-service has
+   already failed to load, dozens of lines further up the log.
+
+   If the base URL does not answer, try its loopback sibling before concluding anything:
+   `127.0.0.1:PORT` when the section says `localhost:PORT`, and the reverse. Dev servers
+   commonly bind only one of the two — `localhost` may resolve to `[::1]` alone — and an
+   app that answers on the sibling was never broken; the documentation was. This is not
+   an exception to never guessing the URL: both names are the same loopback on the same
+   port and neither can reach anything deployed. A port, a host or a path you were not
+   given is still off limits.
 
 **If `CLAUDE.md` has no "Test environment" section, stop.** Do not guess
 `http://localhost:3000`. Do not scan `package.json` for a dev script and hope.
@@ -145,7 +160,7 @@ in the UI — the user cannot tell either. Say so.
 ## 6. When a test fails
 
 A failure is information, and it must be classified correctly before anyone
-touches code. Every failure is exactly one of three things:
+touches code. Every failure is exactly one of four things:
 
 **A bug in the app.** The app is reachable, the flow is correct, the selectors
 resolve, and the behaviour is wrong. Report what was done, what was expected, what
@@ -161,7 +176,21 @@ without the record the flow needs, an unset environment variable, a service the
 page calls that is down. This is not an app bug and must never be reported as one.
 Say exactly what is missing and how to provide it.
 
-If you cannot tell which of the three it is, say so and say what evidence would
+**Wrong documentation.** The section exists, the start command ran without error, and
+what the section states is not true: the base URL answers only under the other loopback
+name, a listed port is dead, a test user does not exist, the reset procedure leaves state
+behind. This is neither an app bug nor a missing environment, and reporting it as either
+is a false alarm — the app is often perfectly healthy three characters away. Quote the
+line that is wrong and give the value that actually worked.
+
+Do not repair it yourself. `CLAUDE.md` is loaded whole into every session of that
+project; it is the project's law and changing it is the owner's call. `FLOWS.md` is
+yours, `CLAUDE.md` is not. And never write the section you were missing: an agent that
+invents a test environment turns this guard inside out — the next run finds a section,
+believes it, and tests against something fabricated. A loud correct failure becomes a
+silent false success.
+
+If you cannot tell which of the four it is, say so and say what evidence would
 settle it. "I don't know yet" is a legitimate report; a confident wrong diagnosis
 is not.
 
